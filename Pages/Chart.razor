@@ -1,0 +1,83 @@
+@page "/chart"
+@using System.Text.Json
+@inject IJSRuntime js
+
+<div style="margin: 20px auto; background-color: rgba(0,0,25,0.75); color: white; padding: 1rem;">
+    <h2>@chartViewModel.DataSets[chartViewModel.selectedDataSet]</h2>
+</div>
+<p>Hello world</p>
+<br />
+<h2>select 1</h2>
+@* <select @onchange=SetSelection1>
+    @foreach (string option in options)
+    {
+        <option value="@option" name="@option">@option</option>
+    }
+</select> *@
+<br />
+<div @bind=model >
+    <h2>select 2</h2>
+    <select @bind=chartViewModel.selectedDataSet>
+        @foreach (ChartDataSet data in chartViewModel.DataSets)
+        {
+            <option value="@data.Index" name="@data.Name">@data.Name</option>
+        }
+    </select>
+ </div>
+<br />
+
+
+<h3>Chart</h3>
+<p>Charting library here:</p>
+
+@*<Card actions="chartViewModel.List"></Card>*@
+<canvas id="test-canvas"></canvas>
+
+
+<MudButton @onclick="Generate" Variant="Variant.Filled" Color="Color.Secondary"> Generate </MudButton>
+<ChartComponent />
+@code {
+    @* TestData testData = new TestData(); *@
+    public ChartViewModel chartViewModel;
+    public async Task Generate() => await js.InvokeVoidAsync("GenerateChart", "test-canvas", chartViewModel.DataSets);
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        this.chartViewModel = new ChartViewModel();
+    }
+
+    public class ChartViewModel
+    {
+        public int selectedDataSet = 0;
+        public List<ChartDataSet> DataSets {get; set;}
+        public ChartViewModel()
+        {
+            DataSets = new List<ChartDataSet>
+                {
+                    new ChartDataSet(0, "first", new List<int>{ 10, 20, 30, 40, 50, 30, 70 }),
+                    new ChartDataSet(1, "second", new List<int>{ 40, 70, 30, 15, 10, 60, 10 }),
+                    new ChartDataSet(2, "third", new List<int>{ 50, 90, 40, 45, 40, 10, 20 })   
+                };
+        }
+    }
+
+    public class ChartDataSet
+    {
+        public int Index { get; set; }
+        public string Name { get; set; }
+        public List<int> Values {get; set;}
+
+        public ChartDataSet(int index, string name, List<int> values)
+        {
+            Index = index;
+            Name = name;
+            Values = values;
+        }
+        //public override string ToString(){
+        //    @* string jsonString = System.Text.Json.JsonSerializer.Serialize(this); *@
+        //    string value = "{" + $"\"first\": {first}, \"second\": {second}, \"third\": {third}" + "}";
+        //    return value;
+        //}
+    };
+}
