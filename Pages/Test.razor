@@ -1,0 +1,50 @@
+@page "/testing"
+
+<p>Hello world</p>
+<br />
+<h2>select 1</h2>
+
+<br />
+<div @bind=model>
+    <h2>select 2</h2>
+    <select @bind=model.BindSelectionIndex>
+        @foreach (string option in model.selectionOptions)
+        {
+            <option value=model.GetIndex(@option) name="@option">@option</option>
+        }
+    </select>
+</div>
+<br />
+
+
+@code {
+    public Model model = new Model();
+
+    public class Model
+    {
+        public List<string> selectionOptions = new List<string> { "Chart 1", "Chart 2 " };
+
+        private int selectionIndex;
+        private string? currentSelectionString;
+
+        public string BindSelectionIndex
+        {
+            get
+            {
+                var index = GetIndex(currentSelectionString);
+                if (index < 0) index = 0;
+                return selectionOptions[index];
+            }
+            set
+            {
+                var index = GetIndex(value);
+                if (index < 0) index = 0;
+                currentSelectionString = selectionOptions[index];
+            }
+        }
+        public int GetIndex(string option)
+        {
+            return selectionOptions.IndexOf(option);
+        }
+    }
+}
